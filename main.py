@@ -1,3 +1,4 @@
+import json
 import pyperclip
 from tkinter import *
 from tkinter import messagebox
@@ -28,19 +29,29 @@ def add_info():
     website = website_ent.get()
     email = email_ent.get()
     password = password_ent.get()
+    data_dict = {
+        website: {
+            "email": email,
+            "password": password,
+        }}
 
     if len(website) == 0 or len(email) == 0 or len(password) == 0:
         messagebox.showinfo(title="Oops", message="You've left a field empty.")
     else:
-        user_check = messagebox.askokcancel(title=website, message=f"These are the details entered:\n\n Email: {email}\n Password: {password}\n\n Is it OK to save?")
-
-        if user_check:
+        try:
+            with open("data.json", "r") as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            with open("data.json", "w") as json_file:
+                json.dump(data_dict, json_file, indent=4)
+        else:
+            data.update(data_dict)
+            with open("data.json", "w") as json_file:
+                json.dump(data, json_file, indent=4)
+        finally:
             website_ent.delete(0, END)
             website_ent.focus()
             password_ent.delete(0, END)
-
-            with open("data.txt", "a") as file:
-                file.write(f"{website} | {email} | {password}\n")
 
 
 root = Tk()
