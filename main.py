@@ -36,7 +36,7 @@ def add_info():
         }}
 
     if len(website) == 0 or len(email) == 0 or len(password) == 0:
-        messagebox.showinfo(title="Oops", message="You've left a field empty.")
+        messagebox.showinfo(title="Oops", message="Website or password field is empty.")
     else:
         try:
             with open("data.json", "r") as json_file:
@@ -52,6 +52,27 @@ def add_info():
             website_ent.delete(0, END)
             website_ent.focus()
             password_ent.delete(0, END)
+
+
+def search_data():
+    website = website_ent.get()
+
+    if len(website) > 0:
+        try:
+            with open("data.json", "r") as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            messagebox.showinfo(title="Oops", message="File data not found.")
+        else:
+            if website in data:
+                email = data[website]["email"]
+                password = data[website]["password"]
+                messagebox.showinfo(title=website, message=f"\nEmail: {email} \nPassword: {password} \n\nPassword copied to clipboard")
+                pyperclip.copy(password)
+            else:
+                messagebox.showinfo(title="Oops", message=f"{website} was not found in data file.")
+    else:
+        messagebox.showinfo(title="Oops", message="Enter a website name to search.")
 
 
 root = Tk()
@@ -76,7 +97,7 @@ password_lb.grid(row=3, column=0)
 
 # entries
 website_ent = Entry()
-website_ent.grid(row=1, column=1, columnspan=2, sticky=EW)
+website_ent.grid(row=1, column=1, sticky=EW)
 website_ent.focus()
 
 email_ent = Entry()
@@ -92,5 +113,8 @@ generate_btn.grid(row=3, column=2)
 
 add_btn = Button(text="Add", command=add_info)
 add_btn.grid(row=4, column=1, columnspan=2, sticky=EW)
+
+search_btn = Button(text="Search", command=search_data)
+search_btn.grid(row=1, column=2, sticky=EW)
 
 root.mainloop()
